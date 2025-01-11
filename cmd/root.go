@@ -19,14 +19,11 @@ var rootCmd = &cobra.Command{
 	Use:   "go-clime",
 	Short: "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+examples and usage of using your application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+
+	// 	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -67,7 +64,7 @@ func initConfig() {
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".go-clime")
 	}
-
+	viper.SetEnvPrefix("clime")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
