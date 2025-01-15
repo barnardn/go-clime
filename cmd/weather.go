@@ -6,6 +6,8 @@ package cmd
 import (
 	"fmt"
 	"log"
+
+	"github.com/barnardn/go-clime/clime"
 	"github.com/barnardn/go-clime/openweathermap"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -15,7 +17,7 @@ import (
 var weatherCmd = &cobra.Command{
 	Use:   "weather",
 	Short: "Returns the current weather conditions",
-	Run: runWeather,
+	Run:   runWeather,
 }
 
 func init() {
@@ -34,10 +36,12 @@ func init() {
 
 func runWeather(cmd *cobra.Command, args []string) {
 	fmt.Println("run weather")
-	client := openweathermap.NewClient(viper.GetString("apikey"))
-	conditions, err := client.CurrentConditions("49002")
+	clime := clime.NewClient(
+		openweathermap.NewClient(viper.GetString("apikey")),
+	)
+	conditions, err := clime.CurrentConditions("49002")
 	if err != nil {
-		log.Fatalf("%v\n", err)
+		log.Fatalf("%+v\n", err)
 	}
-	fmt.Printf("%v", conditions)
+	fmt.Printf("%+v\n", conditions)
 }
