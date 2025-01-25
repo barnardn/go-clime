@@ -1,7 +1,7 @@
 package openweathermap
 
 import (
-	"time"
+	"github.com/moznion/go-optional"
 )
 
 type Coordinates struct {
@@ -18,17 +18,16 @@ type Weather struct {
 }
 
 type System struct {
-	Id int
-	//     Type int
+	Id      int
 	Country string
-	Sunrise time.Duration
-	Sunset  time.Duration
+	Sunrise int64
+	Sunset  int64
 }
 
 type Wind struct {
 	Speed float32
 	Deg   int
-	Gust  int `json:",omitempty"`
+	Gust  optional.Option[float32]
 }
 
 type Cloud struct {
@@ -55,8 +54,8 @@ type Container struct {
 	Sys        System
 	Main       Weather
 	Weather    []Conditions
-	Wind       Wind       `json:",omitempty"`
-	Clouds     Cloud      `json:",omitempty"`
-	Rain       HourlyRate `json:",omitempty"`
-	Snow       HourlyRate `json:",omitempty"`
+	Wind       optional.Option[Wind]
+	Clouds     optional.Option[Cloud]
+	Rain       optional.Option[HourlyRate]
+	Snow       optional.Option[HourlyRate]
 }

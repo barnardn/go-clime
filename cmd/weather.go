@@ -35,13 +35,13 @@ func init() {
 }
 
 func runWeather(cmd *cobra.Command, args []string) {
-	fmt.Println("run weather")
-	clime := clime.NewClient(
+	climeClient := clime.NewClient(
 		openweathermap.NewClient(viper.GetString("apikey")),
 	)
-	conditions, err := clime.CurrentConditions("49002")
+	conditions, err := climeClient.CurrentConditions("49002")
 	if err != nil {
 		log.Fatalf("%+v\n", err)
 	}
-	fmt.Printf("%+v\n", conditions)
+	cc := clime.NewCurrentConditions(*conditions)
+	fmt.Print(cc.String())
 }

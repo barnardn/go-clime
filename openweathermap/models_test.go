@@ -2,8 +2,10 @@ package openweathermap
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/moznion/go-optional"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDeserialize(t *testing.T) {
@@ -40,8 +42,8 @@ func TestDeserialize(t *testing.T) {
 },
 "visibility": 10000,
 "wind": {
-"speed": 0,
-"deg": 0
+"speed": 1.5,
+"deg": 22
 },
 "clouds": {
 "all": 100
@@ -69,4 +71,9 @@ func TestDeserialize(t *testing.T) {
 	assert.Equal(t, float32(272.18), container.Main.FeelsLike)
 	assert.Equal(t, float32(274.16), container.Main.TempMin)
 	assert.Equal(t, float32(275.29), container.Main.TempMax)
+	assert.Equal(t, float32(1.5), container.Wind.Unwrap().Speed)
+	assert.Equal(t, 22, container.Wind.Unwrap().Deg)
+	assert.Equal(t, optional.None[float32](), container.Wind.Unwrap().Gust)
+	assert.Equal(t, 100, container.Clouds.Unwrap().All)
+
 }
