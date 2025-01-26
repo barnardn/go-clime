@@ -22,3 +22,17 @@ func NewClient[APIType any](weatherClient WeatherClient[APIType]) *ClimeClient[A
 func (c *ClimeClient[APIType]) CurrentConditions(zip string) (*APIType, error) {
 	return c.client.CurrentConditions(zip)
 }
+
+func (c *ClimeClient[APIType]) AsyncConditions(zip string) (chan APIType, chan error) {
+	weatherChannel := make(chan APIType)
+	errorChannel := make(chan error)
+	go func() {
+		result, error := c.client.CurrentConditions(zip)
+		if error != nil {
+			errorChannel <- error
+			return
+		}
+		weatherChannel <- *result
+	}()
+	return weatherChannel, errorChannel
+}

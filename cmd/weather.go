@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/barnardn/go-clime/clime"
 	"github.com/barnardn/go-clime/openweathermap"
@@ -28,6 +29,10 @@ func init() {
 }
 
 func runWeather(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		cmd.Help()
+		os.Exit(1)
+	}
 	units := clime.Metric
 	if isImperial {
 		units = clime.Imperial
@@ -35,10 +40,12 @@ func runWeather(cmd *cobra.Command, args []string) {
 	climeClient := clime.NewClient(
 		openweathermap.NewClient(viper.GetString("apikey"), isImperial),
 	)
-	conditions, err := climeClient.CurrentConditions(args[0])
-	if err != nil {
+	ccChan, errChan := climeClient.AsyncConditions(args[0])
+	select {
+	case err := <-errChan:
 		log.Fatalf("%+v\n", err)
+	case conditions := <-ccChan:
+		cc := clime.NewCurrentConditions(conditions, units)
+		fmt.Print(cc.String())
 	}
-	cc := clime.NewCurrentConditions(*conditions, units)
-	fmt.Print(cc.String())
 }
