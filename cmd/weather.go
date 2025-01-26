@@ -20,28 +20,25 @@ var weatherCmd = &cobra.Command{
 	Run:   runWeather,
 }
 
+var isImperial bool
+
 func init() {
 	rootCmd.AddCommand(weatherCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// weatherCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// weatherCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	weatherCmd.Flags().BoolVarP(&isImperial, "imperial", "i", false, "Display imperial measurements")
 }
 
 func runWeather(cmd *cobra.Command, args []string) {
+	units := clime.Metric
+	if isImperial {
+		units = clime.Imperial
+	}
 	climeClient := clime.NewClient(
-		openweathermap.NewClient(viper.GetString("apikey")),
+		openweathermap.NewClient(viper.GetString("apikey"), isImperial),
 	)
-	conditions, err := climeClient.CurrentConditions("49002")
+	conditions, err := climeClient.CurrentConditions(args[0])
 	if err != nil {
 		log.Fatalf("%+v\n", err)
 	}
-	cc := clime.NewCurrentConditions(*conditions)
+	cc := clime.NewCurrentConditions(*conditions, units)
 	fmt.Print(cc.String())
 }

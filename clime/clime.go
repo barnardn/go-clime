@@ -4,6 +4,13 @@ type WeatherClient[APIType any] interface {
 	CurrentConditions(zip string) (*APIType, error)
 }
 
+type UnitsOfMeasure int
+
+const (
+	Metric UnitsOfMeasure = iota
+	Imperial
+)
+
 type ClimeClient[APIType any] struct {
 	client WeatherClient[APIType]
 }

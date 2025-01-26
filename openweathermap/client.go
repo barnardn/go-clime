@@ -11,19 +11,24 @@ import (
 
 const (
 	host          = "api.openweathermap.org"
-	conditionsURL = "data/2.5/weather?appid=%s&zip=%s&units=metric"
+	conditionsURL = "data/2.5/weather?appid=%s&zip=%s&units=%s"
 )
 
 type Client struct {
-	apiKey string
+	apiKey     string
+	isImperial bool
 }
 
-func NewClient(apiKey string) *Client {
-	return &Client{apiKey: apiKey}
+func NewClient(apiKey string, isImperial bool) *Client {
+	return &Client{apiKey: apiKey, isImperial: isImperial}
 }
 
 func (client *Client) CurrentConditions(zip string) (*Container, error) {
-	path := fmt.Sprintf(conditionsURL, client.apiKey, zip)
+	units := "metric"
+	if client.isImperial {
+		units = "imperial"
+	}
+	path := fmt.Sprintf(conditionsURL, client.apiKey, zip, units)
 	link := fmt.Sprintf("http://%s/%s", host, path)
 	fetchUrl, err := url.Parse(link)
 	if err != nil {
