@@ -25,7 +25,7 @@ type progressConfiguration struct {
 }
 
 var configurations = map[ModeType]progressConfiguration{
-	Kitt: progressConfiguration{
+	Kitt: {
 		sequence:     []string{"█▒▒▒▒▒", "▒█▒▒▒▒", "▒▒█▒▒▒", "▒▒▒█▒▒", "▒▒▒▒█▒", "▒▒▒▒▒█"},
 		isReversable: true,
 	},
@@ -54,12 +54,12 @@ func (pi *ProgressIndicator) Start() {
 		pi.hideCursor()
 		indicatorSequnce := pi.configuration.fullSequence()
 		for {
-			select {
-			case <-pi.stopChannel:
-				pi.showCursor()
-				return
-			default:
-				for _, seq := range indicatorSequnce {
+			for _, seq := range indicatorSequnce {
+				select {
+				case <-pi.stopChannel:
+					pi.showCursor()
+					return
+				default:
 					fmt.Print(seq)
 					time.Sleep(250 * time.Millisecond)
 					pi.eraseLine()

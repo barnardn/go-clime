@@ -43,6 +43,7 @@ func runWeather(cmd *cobra.Command, args []string) {
 	)
 	progress := whirly.New(whirly.Kitt)
 	progress.Start()
+
 	ccChan, errChan := climeClient.AsyncConditions(args[0])
 	select {
 	case err := <-errChan:
