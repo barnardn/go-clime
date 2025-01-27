@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 Norm Barnard
-
 */
 package cmd
 
@@ -68,7 +67,7 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Fprintf(os.Stderr, "Bad config file %s: %v\n", viper.ConfigFileUsed(), err)
 	}
 }

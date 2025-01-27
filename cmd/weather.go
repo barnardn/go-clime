@@ -10,6 +10,7 @@ import (
 
 	"github.com/barnardn/go-clime/clime"
 	"github.com/barnardn/go-clime/openweathermap"
+	"github.com/barnardn/go-clime/whirly"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -40,11 +41,15 @@ func runWeather(cmd *cobra.Command, args []string) {
 	climeClient := clime.NewClient(
 		openweathermap.NewClient(viper.GetString("apikey"), isImperial),
 	)
+	progress := whirly.New(whirly.Kitt)
+	progress.Start()
 	ccChan, errChan := climeClient.AsyncConditions(args[0])
 	select {
 	case err := <-errChan:
+		progress.Stop()
 		log.Fatalf("%+v\n", err)
 	case conditions := <-ccChan:
+		progress.Stop()
 		cc := clime.NewCurrentConditions(conditions, units)
 		fmt.Print(cc.String())
 	}
