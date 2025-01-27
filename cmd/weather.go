@@ -22,11 +22,15 @@ var weatherCmd = &cobra.Command{
 	Run:   runWeather,
 }
 
-var isImperial bool
+var (
+	isImperial bool
+	isQuiet    bool
+)
 
 func init() {
 	rootCmd.AddCommand(weatherCmd)
 	weatherCmd.Flags().BoolVarP(&isImperial, "imperial", "i", false, "Display imperial measurements")
+	weatherCmd.Flags().BoolVarP(&isQuiet, "quiet", "q", false, "Quiet mode. Don't show progress indicator")
 }
 
 func runWeather(cmd *cobra.Command, args []string) {
@@ -41,7 +45,11 @@ func runWeather(cmd *cobra.Command, args []string) {
 	climeClient := clime.NewClient(
 		openweathermap.NewClient(viper.GetString("apikey"), isImperial),
 	)
-	progress := whirly.New(whirly.Kitt)
+	whirlyType := whirly.Kitt
+	if isQuiet {
+		whirlyType = whirly.Empty
+	}
+	progress := whirly.New(whirlyType)
 	progress.Start()
 
 	ccChan, errChan := climeClient.AsyncConditions(args[0])

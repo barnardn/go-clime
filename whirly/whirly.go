@@ -11,6 +11,7 @@ type ModeType uint8
 
 const (
 	Kitt ModeType = iota
+	Empty
 )
 
 type ProgressIndicator struct {
@@ -28,6 +29,10 @@ var configurations = map[ModeType]progressConfiguration{
 	Kitt: {
 		sequence:     []string{"█▒▒▒▒▒", "▒█▒▒▒▒", "▒▒█▒▒▒", "▒▒▒█▒▒", "▒▒▒▒█▒", "▒▒▒▒▒█"},
 		isReversable: true,
+	},
+	Empty: {
+		sequence:     []string{},
+		isReversable: false,
 	},
 }
 
@@ -50,6 +55,9 @@ func New(mode ModeType) ProgressIndicator {
 }
 
 func (pi *ProgressIndicator) Start() {
+	if pi.mode == Empty {
+		return
+	}
 	go func() {
 		pi.hideCursor()
 		indicatorSequnce := pi.configuration.fullSequence()
@@ -70,6 +78,9 @@ func (pi *ProgressIndicator) Start() {
 }
 
 func (pi *ProgressIndicator) Stop() {
+	if pi.mode == Empty {
+		return
+	}
 	pi.stopChannel <- struct{}{}
 	pi.eraseLine()
 }
