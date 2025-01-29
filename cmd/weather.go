@@ -34,7 +34,7 @@ func init() {
 	weatherCmd.Flags().BoolVarP(&isImperial, "imperial", "i", false, "Display imperial measurements")
 	weatherCmd.Flags().BoolVarP(&isQuiet, "quiet", "q", false, "Quiet mode. Don't show progress indicator")
 	weatherCmd.Flags().BoolVarP(&justTemp, "just-temp", "t", false, "Return only the temperature")
-	weatherCmd.Flags().BoolVarP(&justTemp, "just-feelslike", "f", false, "Return only the feels like temperature")
+	weatherCmd.Flags().BoolVarP(&justFeelsLike, "just-feelslike", "f", false, "Return only the feels like temperature")
 }
 
 func runWeather(cmd *cobra.Command, args []string) {
