@@ -23,14 +23,18 @@ var weatherCmd = &cobra.Command{
 }
 
 var (
-	isImperial bool
-	isQuiet    bool
+	isImperial    bool
+	isQuiet       bool
+	justTemp      bool
+	justFeelsLike bool
 )
 
 func init() {
 	rootCmd.AddCommand(weatherCmd)
 	weatherCmd.Flags().BoolVarP(&isImperial, "imperial", "i", false, "Display imperial measurements")
 	weatherCmd.Flags().BoolVarP(&isQuiet, "quiet", "q", false, "Quiet mode. Don't show progress indicator")
+	weatherCmd.Flags().BoolVarP(&justTemp, "just-temp", "t", false, "Return only the temperature")
+	weatherCmd.Flags().BoolVarP(&justTemp, "just-feelslike", "f", false, "Return only the feels like temperature")
 }
 
 func runWeather(cmd *cobra.Command, args []string) {
@@ -60,6 +64,12 @@ func runWeather(cmd *cobra.Command, args []string) {
 	case conditions := <-ccChan:
 		progress.Stop()
 		cc := clime.NewCurrentConditions(conditions, units)
-		fmt.Print(cc.String())
+		if justTemp {
+			fmt.Println(cc.TemperatureDetails.Current.String())
+		} else if justFeelsLike {
+			fmt.Println(cc.TemperatureDetails.FeelsLike.String())
+		} else {
+			fmt.Print(cc.String())
+		}
 	}
 }
