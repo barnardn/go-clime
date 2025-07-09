@@ -16,9 +16,8 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "go-clime",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application.`,
+	Short: "Fetch the current weather conditions for your zip code",
+	Long:  `Uses the OpenWeatherMap API to retrive the current weather conditions.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 
