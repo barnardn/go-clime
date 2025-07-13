@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -17,7 +18,21 @@ func NewClient() *Client {
 	return &Client{}
 }
 
-func (client *Client) FetchIP() (*string, error) {
+func (client *Client) PublicIP() (chan string, chan error) {
+	ipChan := make(chan string)
+	errChan := make(chan error)
+	go func() {
+		result, err := client.publicIP()
+		if err != nil {
+			errChan <- err
+			return
+		}
+		ipChan <- *result
+	}()
+	return ipChan, errChan
+}
+
+func (client *Client) publicIP() (*string, error) {
 	link := fmt.Sprintf("http://%s", host)
 	resp, err := http.Get(link)
 	if err != nil {
@@ -31,5 +46,6 @@ func (client *Client) FetchIP() (*string, error) {
 		return nil, errors.New(fmt.Sprintf("can't read response %v", err))
 	}
 	ip := string(body)
-	return &ip, nil
+	trimmed := strings.TrimSpace(ip)
+	return &trimmed, nil
 }

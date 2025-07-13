@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/barnardn/go-clime/geolocatedio"
 	"github.com/barnardn/go-clime/ipclient"
+	"github.com/barnardn/go-clime/whirly"
 	"github.com/spf13/cobra"
 )
 
@@ -28,10 +30,42 @@ func init() {
 }
 
 func runGeocode(cmd *cobra.Command, args []string) {
-	ipClient := ipclient.NewClient()
-	ipAddress, err := ipClient.FetchIP()
+	progress := whirly.New(whirly.Kitt)
+	progress.Start()
+
+	ipAddress, err := runIPfetch()
 	if err != nil {
+		progress.Stop()
 		log.Fatalf("%+v\n", err)
 	}
-	fmt.Print(*ipAddress)
+	location, err := geocode(*ipAddress)
+	if err != nil {
+		progress.Stop()
+		log.Fatalf("%+v\n", err)
+	}
+	progress.Stop()
+	fmt.Printf("Zip Code: %s\n", location.ZipCode)
+}
+
+func runIPfetch() (*string, error) {
+	ipClient := ipclient.NewClient()
+	ipChan, errChan := ipClient.PublicIP()
+	select {
+	case err := <-errChan:
+		return nil, err
+	case ipAddress := <-ipChan:
+		return &ipAddress, nil
+	}
+}
+
+func geocode(ipAddress string) (*geolocatedio.LocationInfo, error) {
+	geoClient := geolocatedio.NewClient("<your api key here>")
+	geoChan, errChan := geoClient.GeoLocation(ipAddress)
+	select {
+	case err := <-errChan:
+		return nil, err
+	case geo := <-geoChan:
+		return &geo, nil
+	}
+
 }
