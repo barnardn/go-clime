@@ -11,6 +11,7 @@ import (
 	"github.com/barnardn/go-clime/ipclient"
 	"github.com/barnardn/go-clime/whirly"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // geocodeCmd represents the geocode command
@@ -44,7 +45,11 @@ func runGeocode(cmd *cobra.Command, args []string) {
 		log.Fatalf("%+v\n", err)
 	}
 	progress.Stop()
-	fmt.Printf("Zip Code: %s\n", location.ZipCode)
+	if justZip {
+		fmt.Printf("Zip Code: %s\n", location.ZipCode)
+	} else {
+		fmt.Println(location.String())
+	}
 }
 
 func runIPfetch() (*string, error) {
@@ -59,7 +64,7 @@ func runIPfetch() (*string, error) {
 }
 
 func geocode(ipAddress string) (*geolocatedio.LocationInfo, error) {
-	geoClient := geolocatedio.NewClient("<your api key here>")
+	geoClient := geolocatedio.NewClient(viper.GetString("geokey"))
 	geoChan, errChan := geoClient.GeoLocation(ipAddress)
 	select {
 	case err := <-errChan:
@@ -67,5 +72,4 @@ func geocode(ipAddress string) (*geolocatedio.LocationInfo, error) {
 	case geo := <-geoChan:
 		return &geo, nil
 	}
-
 }

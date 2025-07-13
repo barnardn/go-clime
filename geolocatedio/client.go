@@ -52,7 +52,22 @@ func (client *Client) geoLocation(ipAddress string) (*LocationInfo, error) {
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("cant read response %v", err))
 	}
-	var locationInfo LocationInfo
+	var locationInfo standardLookup
 	err = json.Unmarshal([]byte(body), &locationInfo)
-	return &locationInfo, err
+	li := LocationInfo{
+		Ip:          locationInfo.Ip,
+		CountryCode: locationInfo.CountryCode,
+		CountryName: locationInfo.CountryName,
+		RegionName:  locationInfo.RegionName,
+		RegionCode:  locationInfo.RegionCode,
+		CityName:    locationInfo.CityName,
+		District:    locationInfo.District,
+		ZipCode:     locationInfo.ZipCode,
+		TimeZone:    locationInfo.TimeZone,
+		Coord: Coordinates{
+			Lat: locationInfo.Latitude,
+			Lon: locationInfo.Longitude,
+		},
+	}
+	return &li, err
 }
