@@ -42,7 +42,7 @@ type standardLookup struct {
 }
 
 func (c *Coordinates) String() string {
-	return fmt.Sprintf("Lat: %0.8f, %0.8f", c.Lat, c.Lon)
+	return fmt.Sprintf("Lat: %0.8f, Lon: %0.8f", c.Lat, c.Lon)
 }
 
 func (l *LocationInfo) String() string {
