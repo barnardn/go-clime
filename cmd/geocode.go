@@ -9,7 +9,6 @@ import (
 
 	"github.com/barnardn/go-clime/geolocatedio"
 	"github.com/barnardn/go-clime/ipclient"
-	"github.com/barnardn/go-clime/whirly"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -21,17 +20,14 @@ var geocodeCmd = &cobra.Command{
 	Run:   runGeocode,
 }
 
-var (
-	justZip bool
-)
-
 func init() {
 	rootCmd.AddCommand(geocodeCmd)
 	geocodeCmd.Flags().BoolVarP(&justZip, "zipcode", "z", false, "Display only the zip code")
+	geocodeCmd.Flags().BoolVarP(&isQuiet, "quiet", "q", false, "Quiet mode. Don't show progress indicator")
 }
 
 func runGeocode(cmd *cobra.Command, args []string) {
-	progress := whirly.New(whirly.Kitt)
+	progress := newWhirly()
 	progress.Start()
 
 	ipAddress, err := runIPfetch()
@@ -46,7 +42,7 @@ func runGeocode(cmd *cobra.Command, args []string) {
 	}
 	progress.Stop()
 	if justZip {
-		fmt.Printf("Zip Code: %s\n", location.ZipCode)
+		fmt.Println(location.ZipCode)
 	} else {
 		fmt.Println(location.String())
 	}

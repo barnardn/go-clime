@@ -10,7 +10,6 @@ import (
 
 	"github.com/barnardn/go-clime/clime"
 	"github.com/barnardn/go-clime/openweathermap"
-	"github.com/barnardn/go-clime/whirly"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -28,21 +27,14 @@ var weatherHereCmd = &cobra.Command{
 	Run:   runWeatherHere,
 }
 
-var (
-	isImperial    bool
-	isQuiet       bool
-	justTemp      bool
-	justFeelsLike bool
-)
-
 func init() {
 	rootCmd.AddCommand(weatherCmd)
-	rootCmd.AddCommand(weatherHereCmd)
 	weatherCmd.Flags().BoolVarP(&isImperial, "imperial", "i", false, "Display imperial measurements")
 	weatherCmd.Flags().BoolVarP(&isQuiet, "quiet", "q", false, "Quiet mode. Don't show progress indicator")
 	weatherCmd.Flags().BoolVarP(&justTemp, "just-temp", "t", false, "Return only the temperature")
 	weatherCmd.Flags().BoolVarP(&justFeelsLike, "just-feelslike", "f", false, "Return only the feels like temperature")
 
+	rootCmd.AddCommand(weatherHereCmd)
 	weatherHereCmd.Flags().BoolVarP(&isImperial, "imperial", "i", false, "Display imperial measurements")
 	weatherHereCmd.Flags().BoolVarP(&isQuiet, "quiet", "q", false, "Quiet mode. Don't show progress indicator")
 	weatherHereCmd.Flags().BoolVarP(&justTemp, "just-temp", "t", false, "Return only the temperature")
@@ -50,11 +42,7 @@ func init() {
 }
 
 func runWeatherHere(cmd *cobra.Command, args []string) {
-	whirlyType := whirly.Kitt
-	if isQuiet {
-		whirlyType = whirly.Empty
-	}
-	progress := whirly.New(whirlyType)
+	progress := newWhirly()
 	progress.Start()
 
 	ipAddress, err := runIPfetch()
@@ -100,13 +88,9 @@ func runWeather(cmd *cobra.Command, args []string) {
 		cmd.Help()
 		os.Exit(1)
 	}
-	whirlyType := whirly.Kitt
-	if isQuiet {
-		whirlyType = whirly.Empty
-	}
-	progress := whirly.New(whirlyType)
-
+	progress := newWhirly()
 	progress.Start()
+
 	cc, err := currentConditions(args[0])
 	progress.Stop()
 

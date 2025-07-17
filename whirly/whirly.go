@@ -15,6 +15,7 @@ const (
 )
 
 type ProgressIndicator struct {
+	didStart      bool
 	mode          ModeType
 	configuration progressConfiguration
 	stopChannel   chan struct{}
@@ -55,9 +56,10 @@ func New(mode ModeType) ProgressIndicator {
 }
 
 func (pi *ProgressIndicator) Start() {
-	if pi.mode == Empty {
+	if pi.mode == Empty || pi.didStart {
 		return
 	}
+	pi.didStart = true
 	go func() {
 		pi.hideCursor()
 		indicatorSequnce := pi.configuration.fullSequence()
@@ -78,10 +80,11 @@ func (pi *ProgressIndicator) Start() {
 }
 
 func (pi *ProgressIndicator) Stop() {
-	if pi.mode == Empty {
+	if pi.mode == Empty || !pi.didStart {
 		return
 	}
 	pi.stopChannel <- struct{}{}
+	pi.didStart = false
 	pi.eraseLine()
 }
 
